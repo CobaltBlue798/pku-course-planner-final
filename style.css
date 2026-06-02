@@ -240,3 +240,8 @@ button {
   font-size: 0.62rem;
   font-weight: 700;
 }
+
+.name-week-label {
+  vertical-align: middle;
+  white-space: nowrap;
+}

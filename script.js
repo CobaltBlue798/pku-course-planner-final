@@ -418,12 +418,12 @@ function renderTimetable() {
         html += `<td>`;
         items.forEach(item => {
           html += `
-            <div class="course-block" style="background:${escapeAttr(item.color)}" title="${escapeAttr(item.name)}｜${escapeAttr(item.teacher)}${item.weekLabel ? "｜" + escapeAttr(item.weekLabel) : ""}">
-              <div class="course-name">${escapeHtml(item.name)}</div>
-              <div class="teacher">
-                ${escapeHtml(item.teacher)}
-                ${item.weekLabel ? `<span class="week-label">${escapeHtml(item.weekLabel)}</span>` : ""}
+            <div class="course-block" style="background:${escapeAttr(item.color)}" title="${escapeAttr(item.name)}${item.weekLabel ? "｜" + escapeAttr(item.weekLabel) : ""}｜${escapeAttr(item.teacher)}">
+              <div class="course-name">
+                ${escapeHtml(item.name)}
+                ${item.weekLabel ? `<span class="week-label name-week-label">${escapeHtml(item.weekLabel)}</span>` : ""}
               </div>
+              <div class="teacher">${escapeHtml(item.teacher)}</div>
             </div>
           `;
         });
@@ -446,34 +446,76 @@ function renderTimetable() {
 function calculateColumnWidths(slots) {
   const periodWidth = 6;
 
-  const dayScores = dayOrder.map(day => {
-    let maxNameLength = 0;
+  const dayStats = dayOrder.map(day => {
+    let maxTextLength = 0;
     let itemCount = 0;
 
     periods.forEach(period => {
       slots[period][day].forEach(item => {
-        maxNameLength = Math.max(maxNameLength, String(item.name || "").length);
+        const name = String(item.name || "");
+        const teacher = String(item.teacher || "");
+        const weekLabel = String(item.weekLabel || "");
+
+        // 同时考虑课程名、教师名、单双周标签
+        const combinedText = `${name}${teacher}${weekLabel}`;
+
+        maxTextLength = Math.max(
+          maxTextLength,
+          name.length,
+          teacher.length,
+          combinedText.length * 0.72
+        );
+
         itemCount += 1;
       });
     });
 
-    return 1 + Math.min(maxNameLength, 18) * 0.055 + Math.min(itemCount, 12) * 0.035;
+    return {
+      day,
+      maxTextLength,
+      itemCount,
+      isEmpty: itemCount === 0,
+    };
+  });
+
+  const dayScores = dayStats.map(stat => {
+    // 完全没课的日期给更低基础分，明显变窄
+    if (stat.isEmpty) {
+      return 0.55;
+    }
+
+    // 有课日期：基础分 + 文本长度权重 + 课程数量权重
+    return (
+      1.0 +
+      Math.min(stat.maxTextLength, 24) * 0.06 +
+      Math.min(stat.itemCount, 14) * 0.035
+    );
   });
 
   const totalScore = dayScores.reduce((a, b) => a + b, 0);
   const remainingWidth = 100 - periodWidth;
 
-  const dayWidths = dayScores.map(score => {
+  let dayWidths = dayScores.map((score, index) => {
+    const stat = dayStats[index];
     const width = (score / totalScore) * remainingWidth;
-    return Math.max(11, Math.min(18, width));
+
+    // 空日期更窄；有课日期保底宽一点
+    if (stat.isEmpty) {
+      return Math.max(6.5, Math.min(9.5, width));
+    }
+
+    return Math.max(10.5, Math.min(19.5, width));
   });
 
+  // 重新缩放，保证总宽度刚好等于 remainingWidth
   const adjustedTotal = dayWidths.reduce((a, b) => a + b, 0);
   const scale = remainingWidth / adjustedTotal;
 
+  dayWidths = dayWidths.map(w => w * scale);
+
   return {
     periodWidth,
-    dayWidths: dayWidths.map(w => w * scale),
+    dayWidths,
   };
 }
 

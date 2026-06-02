@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PKU Course Planner</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="hero">
+    <h1>PKU Course Planner</h1>
+    <p>模拟选课工具：搜索课程、加入课表、检查冲突、导出周课表。</p>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <h2>筛选课程</h2>
+
+      <label>关键词</label>
+      <input id="keywordInput" type="text" placeholder="课程名 / 课程号 / 教师 / 备注" />
+
+      <label>开课单位</label>
+      <select id="departmentSelect"></select>
+
+      <label>课程类型</label>
+      <select id="typeSelect"></select>
+
+      <label class="checkbox-row">
+        <input id="onlyWithTime" type="checkbox" />
+        只看有上课时间的课程
+      </label>
+
+      <label class="checkbox-row">
+        <input id="allowConflict" type="checkbox" />
+        允许添加冲突课程
+      </label>
+
+      <button id="clearSelectedBtn">清空我的课表</button>
+    </aside>
+
+    <section class="content">
+      <nav class="tabs">
+        <button class="tab active" data-tab="search">课程查询</button>
+        <button class="tab" data-tab="schedule">我的课表</button>
+      </nav>
+
+      <section id="searchTab" class="tab-content active">
+        <div class="summary">
+          <span id="resultCount">查询结果：0</span>
+          <span id="selectedCount">已选：0</span>
+        </div>
+
+        <div id="courseList"></div>
+
+        <div class="pagination">
+          <button id="prevPageBtn">上一页</button>
+          <span id="pageInfo">第 1 页</span>
+          <button id="nextPageBtn">下一页</button>
+        </div>
+      </section>
+
+      <section id="scheduleTab" class="tab-content">
+        <h2>已选课程</h2>
+        <div id="selectedList"></div>
+
+        <h2>周课表</h2>
+        <div id="timetable"></div>
+
+        <button id="downloadCsvBtn">下载周课表 CSV</button>
+      </section>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

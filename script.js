@@ -279,9 +279,27 @@ function addCourse(course) {
     return;
   }
 
+  // 课号互斥：同一课程号不能重复选择不同班号
+  const sameCourseCode = selectedCourses.find(c =>
+    String(c["课程号"] || "").trim() !== "" &&
+    String(c["课程号"] || "").trim() === String(course["课程号"] || "").trim()
+  );
+
+  if (sameCourseCode) {
+    alert(
+      `课号互斥：你已经选择了同一课程号的课程。\n\n` +
+      `已选课程：${sameCourseCode["课程名称"] || "未命名课程"} ` +
+      `（课程号：${sameCourseCode["课程号"] || "未列出"}，班号：${sameCourseCode["班号"] || "未列出"}）\n\n` +
+      `当前课程：${course["课程名称"] || "未命名课程"} ` +
+      `（课程号：${course["课程号"] || "未列出"}，班号：${course["班号"] || "未列出"}）\n\n` +
+      `如果想换班，请先在“我的课表”中删除已选的同课程号课程。`
+    );
+    return;
+  }
+
   const newCourse = {
-  ...course,
-  "课表颜色": "",
+    ...course,
+    "课表颜色": "",
   };
 
   const allowConflict = document.getElementById("allowConflict").checked;
@@ -400,9 +418,12 @@ function renderTimetable() {
         html += `<td>`;
         items.forEach(item => {
           html += `
-            <div class="course-block" style="background:${escapeAttr(item.color)}" title="${escapeAttr(item.name)}｜${escapeAttr(item.teacher)}">
+            <div class="course-block" style="background:${escapeAttr(item.color)}" title="${escapeAttr(item.name)}｜${escapeAttr(item.teacher)}${item.weekLabel ? "｜" + escapeAttr(item.weekLabel) : ""}">
               <div class="course-name">${escapeHtml(item.name)}</div>
-              <div class="teacher">${escapeHtml(item.teacher)}</div>
+              <div class="teacher">
+                ${escapeHtml(item.teacher)}
+                ${item.weekLabel ? `<span class="week-label">${escapeHtml(item.weekLabel)}</span>` : ""}
+              </div>
             </div>
           `;
         });
@@ -477,7 +498,12 @@ const teacher = course["教师"] || "教师未列出";
 
       for (let p = t.start; p <= t.end; p++) {
         if (slots[p] && slots[p][t.day]) {
-          slots[p][t.day].push({ name, teacher, color });
+          slots[p][t.day].push({
+            name,
+            teacher,
+            color,
+            weekLabel: getWeekLabel(t),
+          });
         }
       }
     });
@@ -552,6 +578,20 @@ function parseTime(timeText, qzz = "") {
   return results;
 }
 
+function getWeekLabel(slot) {
+  const raw = String(slot.raw || "");
+
+  if (raw.includes("单")) {
+    return "单周";
+  }
+
+  if (raw.includes("双")) {
+    return "双周";
+  }
+
+  return "";
+}
+
 function findConflict(newCourse) {
   const newTimes = parseTime(newCourse["上课时间"] || "", newCourse["起止周"] || "");
 
@@ -601,7 +641,7 @@ function downloadTimetableCsv() {
 
     dayOrder.forEach(day => {
       const cell = slots[period][day]
-        .map(item => `${item.name}\n${item.teacher}`)
+        .map(item => `${item.name}\n${item.teacher}${item.weekLabel ? "｜" + item.weekLabel : ""}`)
         .join("\n---\n");
 
       row.push(cell);

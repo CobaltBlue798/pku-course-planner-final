@@ -230,3 +230,13 @@ button {
   font-weight: 700;
   color: #7a3124;
 }
+
+.week-label {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  font-size: 0.62rem;
+  font-weight: 700;
+}

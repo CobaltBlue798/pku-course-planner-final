@@ -119,22 +119,7 @@ function fillSelect(id, values) {
 }
 
 function bindEvents() {
-  document.getElementById("keywordInput").addEventListener("input", () => {
-    currentPage = 1;
-    renderCourseList();
-  });
-
-  document.getElementById("departmentSelect").addEventListener("change", () => {
-    currentPage = 1;
-    renderCourseList();
-  });
-
-  document.getElementById("typeSelect").addEventListener("change", () => {
-    currentPage = 1;
-    renderCourseList();
-  });
-
-  document.getElementById("onlyWithTime").addEventListener("change", () => {
+  document.getElementById("searchBtn").addEventListener("click", () => {
     currentPage = 1;
     renderCourseList();
   });
@@ -157,6 +142,9 @@ function bindEvents() {
   });
 
   document.getElementById("clearSelectedBtn").addEventListener("click", () => {
+    const ok = confirm("确定要清空当前课表吗？这个操作不能撤销。");
+    if (!ok) return;
+
     selectedCourses = [];
     saveSelected();
     renderCourseList();

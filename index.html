@@ -35,7 +35,7 @@
         允许添加冲突课程
       </label>
 
-      <button id="clearSelectedBtn">清空我的课表</button>
+      <button id="searchBtn">确认搜索</button>
     </aside>
 
     <section class="content">
@@ -60,7 +60,11 @@
       </section>
 
       <section id="scheduleTab" class="tab-content">
-        <h2>已选课程</h2>
+        <div class="schedule-header">
+          <h2>已选课程</h2>
+          <button id="clearSelectedBtn" class="danger-btn">清空我的课表</button>
+        </div>
+
         <div id="selectedList"></div>
 
         <h2>周课表</h2>

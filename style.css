@@ -245,3 +245,30 @@ button {
   vertical-align: middle;
   white-space: nowrap;
 }
+
+.schedule-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.schedule-header h2 {
+  margin: 0;
+}
+
+.schedule-header button {
+  width: auto;
+  min-width: 130px;
+  padding: 8px 16px;
+}
+
+.danger-btn {
+  background: #8C1515;
+  color: white;
+}
+
+.danger-btn:hover {
+  filter: brightness(0.92);
+}

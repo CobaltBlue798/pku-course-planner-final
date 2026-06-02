@@ -118,11 +118,24 @@ function fillSelect(id, values) {
   });
 }
 
+function runSearch() {
+  currentPage = 1;
+  renderCourseList();
+}
+
 function bindEvents() {
-  document.getElementById("searchBtn").addEventListener("click", () => {
-    currentPage = 1;
-    renderCourseList();
+  document.getElementById("searchBtn").addEventListener("click", runSearch);
+
+  document.getElementById("keywordInput").addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      runSearch();
+    }
   });
+
+  document.getElementById("departmentSelect").addEventListener("change", runSearch);
+  document.getElementById("typeSelect").addEventListener("change", runSearch);
+  document.getElementById("onlyWithTime").addEventListener("change", runSearch);
 
   document.getElementById("prevPageBtn").addEventListener("click", () => {
     if (currentPage > 1) {
